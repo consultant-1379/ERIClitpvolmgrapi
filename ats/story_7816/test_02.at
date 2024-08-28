@@ -1,0 +1,28 @@
+litp create -t system -p /infrastructure/systems/system1 -o system_name='AT_node'
+litp create -t disk -p /infrastructure/systems/system1/disks/disk0 -o name=hd0 size=512G bootable=true uuid=XYZ
+litp create -t os-profile -p /software/profiles/osprofile1 -o name="node-iso" path="/cobbler/ks_mirror/node-iso-x86_64"
+
+litp create -t deployment -p /deployments/site1
+litp create -t cluster -p /deployments/site1/clusters/cluster1
+
+litp create -t node -p /deployments/site1/clusters/cluster1/nodes/node1 -o hostname='node1'
+litp inherit -p /deployments/site1/clusters/cluster1/nodes/node1/system -s /infrastructure/systems/system1
+litp inherit -p /deployments/site1/clusters/cluster1/nodes/node1/os -s /software/profiles/osprofile1
+
+litp create -t node -p /deployments/site1/clusters/cluster1/nodes/node2 -o hostname='node2'
+litp inherit -p /deployments/site1/clusters/cluster1/nodes/node2/system -s /infrastructure/systems/system1
+litp inherit -p /deployments/site1/clusters/cluster1/nodes/node2/os -s /software/profiles/osprofile1
+
+litp load -p /infrastructure/storage/storage_profiles -f profile.xml
+assertProperty /infrastructure/storage/storage_profiles/profile_test_7816/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_string_here
+
+litp load -p /deployments/site1/clusters/cluster1/nodes/node1 -f storage_profile_n1.xml
+assertProperty /deployments/site1/clusters/cluster1/nodes/node1/storage_profile/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_string_here
+
+litp load -p /deployments/site1/clusters/cluster1/nodes/node2 -f storage_profile_n2.xml
+assertProperty /deployments/site1/clusters/cluster1/nodes/node2/storage_profile/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_other_string_here
+
+litp load -p /infrastructure/storage/storage_profiles/profile_test_7816/volume_groups/vg1/file_systems -f fs_update.xml --merge
+assertProperty /infrastructure/storage/storage_profiles/profile_test_7816/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_string_here_updated
+assertProperty /deployments/site1/clusters/cluster1/nodes/node1/storage_profile/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_string_here_updated
+assertProperty /deployments/site1/clusters/cluster1/nodes/node2/storage_profile/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_other_string_here

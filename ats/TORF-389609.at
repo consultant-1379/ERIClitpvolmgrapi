@@ -1,0 +1,14 @@
+runLitpScript minimum_deployment.inc
+
+
+# Create a file-system of type xfs
+litp create -t file-system -p /infrastructure/storage/storage_profiles/profile_1/volume_groups/vg_1/file_systems/xfs_fs -o type=xfs mount_point=/ size=4G snap_size=100
+assertProperty  /infrastructure/storage/storage_profiles/profile_1/volume_groups/vg_1/file_systems/xfs_fs -o type=xfs mount_point=/ size=4G snap_size=100
+
+# Create a file-system where type gets set to the default
+litp create -t file-system -p /infrastructure/storage/storage_profiles/profile_1/volume_groups/vg_1/file_systems/xfs_default -o mount_point=/ size=4G snap_size=100
+assertProperty  /infrastructure/storage/storage_profiles/profile_1/volume_groups/vg_1/file_systems/xfs_default -o type=xfs mount_point=/ size=4G snap_size=100
+
+# Try create a file-system with an invalid type
+let __err_case_1 --err_type ValidationError --err_message "Invalid value 'invalid_entry'. Value must be a valid file system type: one of 'ext4', 'xfs', 'vxfs' or 'swap'"
+assertError __err_case_1 --err_property type create -t file-system -p /infrastructure/storage/storage_profiles/profile_1/volume_groups/vg_1/file_systems/invalid_type -o type=invalid_entry mount_point=/ size=4G snap_size=100

@@ -1,0 +1,39 @@
+litp create -t system -p /infrastructure/systems/system1 -o system_name='AT_node'
+litp create -t disk -p /infrastructure/systems/system1/disks/disk0 -o name=hd0 size=512G bootable=true uuid=XYZ
+litp create -t os-profile -p /software/profiles/osprofile1 -o name="node-iso" path="/cobbler/ks_mirror/node-iso-x86_64"
+
+litp create -t deployment -p /deployments/site1
+litp create -t cluster -p /deployments/site1/clusters/cluster1
+
+litp create -t node -p /deployments/site1/clusters/cluster1/nodes/node1 -o hostname='node1'
+litp inherit -p /deployments/site1/clusters/cluster1/nodes/node1/system -s /infrastructure/systems/system1
+litp inherit -p /deployments/site1/clusters/cluster1/nodes/node1/os -s /software/profiles/osprofile1
+
+litp create -t node -p /deployments/site1/clusters/cluster1/nodes/node2 -o hostname='node2'
+litp inherit -p /deployments/site1/clusters/cluster1/nodes/node2/system -s /infrastructure/systems/system1
+litp inherit -p /deployments/site1/clusters/cluster1/nodes/node2/os -s /software/profiles/osprofile1
+
+litp create -p /infrastructure/storage/storage_profiles/profile_test_7816 -t storage-profile
+litp create -p /infrastructure/storage/storage_profiles/profile_test_7816/volume_groups/vg1 -t volume-group -o volume_group_name="vg_root_7816"
+litp create -p /infrastructure/storage/storage_profiles/profile_test_7816/volume_groups/vg1/file_systems/fs_test_7816 -t file-system -o type='ext4' mount_point="/" size="8G" backup_policy=some_string_here
+assertProperty /infrastructure/storage/storage_profiles/profile_test_7816/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_string_here
+
+litp inherit -p /deployments/site1/clusters/cluster1/nodes/node1/storage_profile -s /infrastructure/storage/storage_profiles/profile_test_7816
+assertProperty /deployments/site1/clusters/cluster1/nodes/node1/storage_profile/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_string_here
+
+litp inherit -p /deployments/site1/clusters/cluster1/nodes/node2/storage_profile -s /infrastructure/storage/storage_profiles/profile_test_7816
+litp update -p /deployments/site1/clusters/cluster1/nodes/node2/storage_profile/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_other_string_here
+assertProperty /deployments/site1/clusters/cluster1/nodes/node2/storage_profile/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_other_string_here
+
+litp update -p /deployments/site1/clusters/cluster1/nodes/node2/storage_profile/volume_groups/vg1/file_systems/fs_test_7816 -d backup_policy
+assertProperty  /deployments/site1/clusters/cluster1/nodes/node2/storage_profile/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_string_here
+
+litp update -p /infrastructure/storage/storage_profiles/profile_test_7816/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_string_here_updated
+assertProperty /infrastructure/storage/storage_profiles/profile_test_7816/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_string_here_updated
+assertProperty /deployments/site1/clusters/cluster1/nodes/node1/storage_profile/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_string_here_updated
+assertProperty /deployments/site1/clusters/cluster1/nodes/node2/storage_profile/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy=some_string_here_updated
+
+litp update -p /infrastructure/storage/storage_profiles/profile_test_7816/volume_groups/vg1/file_systems/fs_test_7816 -d backup_policy
+assertPropertyUnset -p /infrastructure/storage/storage_profiles/profile_test_7816/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy
+assertPropertyUnset -p /deployments/site1/clusters/cluster1/nodes/node1/storage_profile/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy
+assertPropertyUnset -p /deployments/site1/clusters/cluster1/nodes/node2/storage_profile/volume_groups/vg1/file_systems/fs_test_7816 -o backup_policy

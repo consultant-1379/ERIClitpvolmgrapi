@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<litp:storage-profile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:litp="http://www.ericsson.com/litp" xsi:schemaLocation="http://www.ericsson.com/litp litp-xml-schema/litp.xsd" id="profile_test_7816">
+  <volume_driver>lvm</volume_driver>
+  <litp:storage-profile-volume_groups-collection id="volume_groups">
+    <litp:volume-group id="vg1">
+      <volume_group_name>vg_root</volume_group_name>
+      <litp:volume-group-file_systems-collection id="file_systems">
+        <litp:file-system id="fs_test_7816">
+          <backup_policy>some_string_here</backup_policy>
+          <mount_point>/</mount_point>
+          <size>8G</size>
+          <snap_size>100</snap_size>
+          <type>ext4</type>
+        </litp:file-system>
+      </litp:volume-group-file_systems-collection>
+      <litp:volume-group-physical_devices-collection id="physical_devices">
+        <litp:physical-device id="disk_0">
+            <device_name>hd0</device_name>
+        </litp:physical-device>
+      </litp:volume-group-physical_devices-collection>
+    </litp:volume-group>
+  </litp:storage-profile-volume_groups-collection>
+</litp:storage-profile>
+

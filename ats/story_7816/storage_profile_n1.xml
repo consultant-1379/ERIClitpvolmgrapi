@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<litp:storage-profile-inherit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:litp="http://www.ericsson.com/litp" xsi:schemaLocation="http://www.ericsson.com/litp litp-xml-schema/litp.xsd" id="storage_profile" source_path="/infrastructure/storage/storage_profiles/profile_test_7816">
+  <litp:storage-profile-volume_groups-collection-inherit source_path="/infrastructure/storage/storage_profiles/profile_test_7816/volume_groups" id="volume_groups">
+    <litp:volume-group-inherit source_path="/infrastructure/storage/storage_profiles/profile_test_7816/volume_groups/vg1" id="vg1">
+      <litp:volume-group-file_systems-collection-inherit source_path="/infrastructure/storage/storage_profiles/profile_test_7816/volume_groups/vg1/file_systems" id="file_systems">
+        <litp:file-system-inherit source_path="/infrastructure/storage/storage_profiles/profile_test_7816/volume_groups/vg1/file_systems/fs_test_7816" id="fs_test_7816"/>
+      </litp:volume-group-file_systems-collection-inherit>
+    </litp:volume-group-inherit>
+  </litp:storage-profile-volume_groups-collection-inherit>
+</litp:storage-profile-inherit>
+

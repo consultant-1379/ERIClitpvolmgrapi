@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<litp:file-system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:litp="http://www.ericsson.com/litp" xsi:schemaLocation="http://www.ericsson.com/litp litp-xml-schema/litp.xsd" id="fs_test_7816">
+  <backup_policy>some_string_here_updated</backup_policy>
+  <mount_point>/</mount_point>
+  <size>8G</size>
+  <snap_size>100</snap_size>
+  <type>ext4</type>
+</litp:file-system>

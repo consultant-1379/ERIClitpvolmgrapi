@@ -1,0 +1,30 @@
+# TORF-135323
+#
+# "litp allowed me to create a FS with mount_point=swap and type=ext4 (the resulting plan hung)"
+
+runLitpScript minimum_deployment.inc
+
+litp create -t disk -p /infrastructure/systems/system_ms/disks/d0 -o name=hd0 size=370G bootable=true uuid=6000c29d5d7e6fbe9cb14af87734d5a5
+litp create -t storage-profile -p /infrastructure/storage/storage_profiles/profile_ms -o volume_driver=lvm
+litp create -t volume-group -p /infrastructure/storage/storage_profiles/profile_ms/volume_groups/vg_ms -o volume_group_name=vg_root
+
+# Verify that a validation error is thrown if we try to create a filesystem with mount_point
+# set to "swap" and type set to "ext4" or "vxfs" (anything but "swap")
+
+let __err_case_1 --err_type ValidationError --err_message 'A "mount_point" of "swap" may only be specified for a "file-system" of "type" "swap".'
+
+assertError __err_case_1 create -t file-system -p /infrastructure/storage/storage_profiles/profile_ms/volume_groups/vg_ms/file_systems/swap -o type=ext4 mount_point=swap size=2G snap_size=5 backup_snap_size=10
+assertError __err_case_1 create -t file-system -p /infrastructure/storage/storage_profiles/profile_ms/volume_groups/vg_ms/file_systems/swap -o type=vxfs mount_point=swap size=2G snap_size=5 backup_snap_size=10
+
+# Verify that a validation error is thrown if we try to create a filesystem of type "swap"
+# with a mount_point type set to anything other than "swap"
+
+let __err_case_2 --err_type ValidationError --err_message 'A "file-system" of "type" "swap" must also have a "mount_point" of "swap".'
+
+assertError __err_case_2 create -t file-system -p /infrastructure/storage/storage_profiles/profile_ms/volume_groups/vg_ms/file_systems/swap -o type=swap mount_point=/foo size=2G snap_size=5 backup_snap_size=10
+assertError __err_case_2 create -t file-system -p /infrastructure/storage/storage_profiles/profile_ms/volume_groups/vg_ms/file_systems/swap -o type=swap mount_point=/swap size=2G snap_size=5 backup_snap_size=10
+
+# Verify that a no validation error is thrown if we create a filesystem with mount_point
+# set to "swap" and type set to "swap".
+
+litp create -t file-system -p /infrastructure/storage/storage_profiles/profile_ms/volume_groups/vg_ms/file_systems/swap -o type=swap mount_point=swap size=2G snap_size=5 backup_snap_size=10
